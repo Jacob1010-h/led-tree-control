@@ -1,7 +1,7 @@
 class Color:
-    def __init__(self, r, g, b):
-        self.r = r
+    def __init__(self, g, r, b):
         self.g = g
+        self.r = r
         self.b = b
 
     # converts to hex
@@ -20,7 +20,7 @@ class Color:
     def toRGB(self):
         # cast to tuple
         return (self.r, self.g, self.b)
-
+    
 class Colors:
     RED = Color(255, 0, 0)
     GREEN = Color(0, 255, 0)
