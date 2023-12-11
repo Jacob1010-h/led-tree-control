@@ -33,4 +33,4 @@ import webrepl
 
 webrepl.start()
 
-exec(open("start.py").read())
+exec(open("main.py").read())
