@@ -56,15 +56,24 @@ class Controller:
         # Create neo pixel array
         self.np = neopixel.NeoPixel(machine.Pin(self.pin), pixels)
 
-    # DOES NOT update the pixels
     def onRange(self, start, end, color: Color):
         for i in range(start, end):
             self.np[i] = (color.r, color.g, color.b)
+        self.show()
 
-    # DOES NOT update the pixels
     def offRange(self, start, end):
         for i in range(start, end):
             self.np[i] = Colors.BLACK.toRGB()
+        self.show()
+
+    def setBrightness(self, brightness):
+        if brightness > 1.0:
+            brightness = 1.0
+        elif brightness < 0.0:
+            brightness = 0.0
+        for i in range(self.np.n):
+            self.np[i] = tuple(int(c * brightness) for c in self.np[i])
+        self.show()
 
     # DOES update the pixels
     def show(self):

@@ -20,17 +20,15 @@ def do_connect(ssid, pwd):
 
 # Attempt to connect to WiFi network
 import os
-from dotenv import load_dotenv
-
-load_dotenv("./net.env")
+import net
 
 do_connect(
-    os.getenv("NAME"),
-    os.getenv("PASSWORD")
+    net.NAME,
+    net.PASS
 )
 
 import webrepl
 
 webrepl.start()
 
-exec(open("main.py").read())
+# exec(open("main.py").read())
