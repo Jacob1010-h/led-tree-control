@@ -28,25 +28,28 @@ def rgb_to_hsv(r, g, b):
     return h, s, v
 
 def hsv_to_rgb(h, s, v):
-    h = float(h)
-    s = float(s)
-    v = float(v)
-    h60 = h / 42.666667 # Note: this was 60.0 before
-    h60f = math.floor(h60)
-    hi = int(h60f) % 6
-    f = h60 - h60f
-    p = v * (1 - s)
-    q = v * (1 - f * s)
-    t = v * (1 - (1 - f) * s)
-    r, g, b = 0, 0, 0
-    if hi == 0: r, g, b = v, t, p
-    elif hi == 1: r, g, b = q, v, p
-    elif hi == 2: r, g, b = p, v, t
-    elif hi == 3: r, g, b = p, q, v
-    elif hi == 4: r, g, b = t, p, v
-    elif hi == 5: r, g, b = v, p, q
-    r, g, b = int(r * 255), int(g * 255), int(b * 255)
-    return r, g, b
+    h/=360.0
+    if s == 0.0:
+        return int(v*255), int(v*255), int(v*255)
+    i = int(h*6.0) # XXX assume int() truncates!
+    f = (h*6.0) - i
+    p = v*(1.0 - s)
+    q = v*(1.0 - s*f)
+    t = v*(1.0 - s*(1.0-f))
+    i %= 6
+    if i == 0:
+        return int(v*255), int(t*255), int(p*255)
+    if i == 1:
+        return int(q*255), int(v*255), int(p*255)
+    if i == 2:
+        return int(p*255), int(v*255), int(t*255)
+    if i == 3:
+        return int(p*255), int(q*255), int(v*255)
+    if i == 4:
+        return int(t*255), int(p*255), int(v*255)
+    if i == 5:
+        return int(v*255), int(p*255), int(q*255)
+    # Cannot get here
 
 class Controller:
     def __init__(self, pin, pixels):
@@ -59,24 +62,20 @@ class Controller:
     def onRange(self, start, end, color: Color):
         for i in range(start, end):
             self.np[i] = (color.r, color.g, color.b)
-        self.show()
 
     def offRange(self, start, end):
         for i in range(start, end):
             self.np[i] = Colors.BLACK.toRGB()
-        self.show()
+        
 
     def setBrightness(self, brightness):
-        if brightness > 1.0:
-            brightness = 1.0
-        elif brightness < 0.0:
-            brightness = 0.0
+        brightness = min(1.0, max(0.07, brightness))
         for i in range(self.np.n):
             self.np[i] = tuple(int(c * brightness) for c in self.np[i])
-        self.show()
+        
 
     # DOES update the pixels
-    def show(self):
+    def apply(self):
         self.np.write()
 
     # DOES update the pixels
@@ -88,7 +87,7 @@ class Controller:
             for __ in range(n):
                 self.np[__] = Colors.BLACK.toRGB()
             self.np[_ % n] = color
-            self.show()
+            self.apply()
             time.sleep_ms(80)
 
     # DOES update the pixels
@@ -103,11 +102,11 @@ class Controller:
                 self.np[_ % n] = Colors.BLACK.toRGB()
             else:
                 self.np[n - 1 - (_ % n)] = Colors.BLACK.toRGB()
-            self.show()
+            self.apply()
             time.sleep_ms(80)
 
     # DOES update the pixels
-    def rainbow_cycle(self, wait, brightness=1.0):
+    def rainbow_cycle(self, wait, brightness=0.4):
         n = self.np.n
         for j in range(256):  # one cycle of all 256 colors in the wheel
             for i in range(n):
@@ -116,14 +115,21 @@ class Controller:
                 rgb_color = hsv_to_rgb(*hsv_color)
                 dimmed_rgb = tuple(int(c * brightness) for c in rgb_color)  # apply brightness
                 self.np[i] = dimmed_rgb
-            self.show()
+            self.apply()
+            time.sleep_ms(wait)
+
+    def rainbow_pulse(self, start, end, wait=35, brightness=0.4, loops=1):
+        for hue in range(360*loops+196):
+            rgb_color = hsv_to_rgb(hue%360, 1, brightness)
+            self.onRange(start, end, Color(rgb_color[0], rgb_color[1], rgb_color[2]))
+            self.apply()
             time.sleep_ms(wait)
 
     # DOES update the pixels
     def clear(self):
         n = self.np.n
-        
         for _ in range(n):
             self.np[_] = Colors.BLACK.toRGB()
-        self.show()
+            self.apply()
+            time.sleep_ms(10)
 
