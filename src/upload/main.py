@@ -2,11 +2,20 @@ from Controller import Controller, hsv_to_rgb
 from Color import Color
 from Color import Colors
 import uasyncio
+import urequests as requests 
+import json
 from microdot_asyncio import Microdot
 import time
 
 controller = Controller(4, 50)
 app = Microdot()
+
+while True:
+    res = requests.get(url="https://led-tree.vercel.app/api/lights")
+    print(res.text)
+    data = json.loads(res.text)
+    print(data)
+    
 
 
 @app.route('/')
