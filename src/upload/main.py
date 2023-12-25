@@ -2,12 +2,45 @@ from Controller import Controller, hsv_to_rgb
 from Color import Color
 from Color import Colors
 import uasyncio
+import urequests as requests
+import json
 from microdot_asyncio import Microdot
 import time
 
 controller = Controller(4, 50)
 app = Microdot()
 
+while True:
+    res = requests.get('https://led-tree.vercel.app/api/lights')
+    data = json.loads(res.text)
+    animation = data['inputs']['animation']
+    brightness = int(data['inputs']['brightness'])/100
+    toggle = data['inputs']['toggle']
+    color = data['inputs']['color']['rgb']
+    print(toggle, animation, brightness, color)
+    if toggle == False:
+        controller.clear()
+    else:
+        red = int(color['r'])
+        green = int(color['g'])
+        blue = int(color['b'])
+        controller.onRange(0, 50, Color(red, green, blue))
+        controller.setBrightness(brightness)
+        controller.apply()
+        
+        if animation == 'Bounce':
+            controller.bounce(Color(red, green, blue))
+            controller.clear()
+        # elif animation == 'Cycle':
+        #     controller.cycle(Color(red, green, blue))
+        #     controller.clear()
+        elif animation == 'Rainbow Cycle':
+            controller.rainbow_cycle(wait=10, brightness=brightness)
+            controller.clear()
+        elif animation == 'Rainbow':
+            controller.rainbow_pulse(start=0, end=50, brightness=brightness, loops=1)
+            controller.clear()
+    
 
 @app.route('/')
 async def hello(request):
