@@ -22,7 +22,7 @@ name: documentation
 on:
   push:
     branches:
-      - main
+      -main
       -master
 
 env:
