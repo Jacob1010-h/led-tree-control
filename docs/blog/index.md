@@ -6,7 +6,4 @@ One day I was thinking about making a project to add to my resume and randomly w
 
 I'm not very knowledgeable with electronics in general, so when I was going through this project, I learned various things such as soldering and wiring. When ordering the controller for the program I needed it to be small and compact, but yet powerful for it's size. I went through many different processors, but I landed on the [Seeed ESP32 C-3](https://www.seeedstudio.com/Seeed-XIAO-ESP32C3-p-5431.html). It had fitted all of my criteria, and had WiFi. It was WiFi from the board that inspired my twist on the original project in the first place. 
 
-The "twist" I keep mentioning was to create a 3D mappable led tree BUT instead with a website that you can control the LEDs with over the internet. There were to two aspects of this project that I needed to complete within the time frame:
-
-1. The website that hooks into a database with and api for the program to access.
-2. The program to check the website, make a GET request and update the led's based on that input. 
+The "twist" I keep mentioning was to create a 3D mappable led tree BUT make a website that a user can interact with to control the LEDs with over the internet. This blog references the experience and process that happened while making this project, which is still not complete due to a lack of time.
